@@ -1,4 +1,5 @@
 import os
+import sys
 
 import torch
 from pytorch_lightning import LightningModule, Trainer
@@ -15,6 +16,10 @@ AVAIL_GPUS = min(1, torch.cuda.device_count())
 BATCH_SIZE = 256 if AVAIL_GPUS else 64
 
 if __name__ == '__main__':
+    max_epochs = 3
+    if len(sys.argv) > 1:
+        max_epochs = int(sys.argv[1])
+        print(f'Max epochs = {max_epochs}')
     # Init our model
     mnist_model = ResNet50(num_classes=10)
 
