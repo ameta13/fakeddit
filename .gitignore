@@ -1,3 +1,6 @@
 lightning_logs
 .idea
+__pycache__
 MNIST
+dataset/images
+dataset/multimodal_*.tsv

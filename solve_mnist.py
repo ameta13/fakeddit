@@ -2,11 +2,8 @@ import os
 import argparse
 
 import torch
-from pytorch_lightning import Trainer
-from torch import nn
-from torch.nn import functional as F
+from pytorch_lightning import Trainer, loggers
 from torch.utils.data import DataLoader, random_split
-from torchmetrics import Accuracy
 from torchvision import transforms
 from torchvision.datasets import MNIST
 from resnet import ResNet50
@@ -32,14 +29,15 @@ if __name__ == '__main__':
     dataset = MNIST(PATH_DATASETS, download=True, transform=transforms.ToTensor())
     train, val = random_split(dataset, [55000, 5000])
 
-    train_loader = DataLoader(train, batch_size=BATCH_SIZE, num_workers=8, persistent_workers=True)
-    val_loader = DataLoader(val)
+    train_loader = DataLoader(train, batch_size=BATCH_SIZE, num_workers=4, persistent_workers=True)
+    val_loader = DataLoader(val, batch_size=BATCH_SIZE, num_workers=4, persistent_workers=True)
 
     # Initialize a trainer
     trainer = Trainer(
         gpus=AVAIL_GPUS,
         max_epochs=num_epochs,
-        progress_bar_refresh_rate=100,
+        progress_bar_refresh_rate=5,
+        logger=loggers.TensorBoardLogger('logs/'),
     )
     # Train the model ⚡
     trainer.fit(mnist_model, train_loader, val_loader)
