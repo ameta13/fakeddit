@@ -15,6 +15,8 @@ class ResNet50(ResNet, LightningModule):
     # def forward(self, x) - define in ResNet
 
     def common_step(self, batch, batch_idx, mode):
+        print(type(batch), len(batch))
+        print(batch)
         x, y = batch
         y_pred = self(x)
         loss = F.cross_entropy(y_pred, y)  # F.mse_loss(self(x), x)
