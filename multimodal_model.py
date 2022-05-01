@@ -50,7 +50,20 @@ class MultiModalModel(LightningModule):
         # assert len(y.shape) == 1
         # self.log(f"{mode}_accuracy", torch.sum(y_pred.max(axis=1).indices == y) / y.shape[0])
         # return loss
-        self.image_model.common_step(batch, batch_idx, mode)
+        print(type(batch), len(batch))
+        print(batch)
+        x = {
+        'bert_input_id': batch['bert_input_id'], 
+        'bert_attention_mask': batch['bert_attention_mask'], 
+        'image': batch['image']
+        }
+        y = batch['label']
+        y_pred = self(x)
+        loss = F.cross_entropy(y_pred, y)  # F.mse_loss(self(x), x)
+        self.log(f"{mode}_loss", loss)
+        assert len(y.shape) == 1
+        self.log(f"{mode}_accuracy", torch.sum(y_pred.max(axis=1).indices == y)/y.shape[0])
+        return loss
 
     def training_step(self, batch, batch_idx):
         # training_step defines the train loop. It is independent of forward
