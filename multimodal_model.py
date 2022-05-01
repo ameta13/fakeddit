@@ -50,8 +50,6 @@ class MultiModalModel(LightningModule):
         # assert len(y.shape) == 1
         # self.log(f"{mode}_accuracy", torch.sum(y_pred.max(axis=1).indices == y) / y.shape[0])
         # return loss
-        print(type(batch), len(batch))
-        print(batch)
         x = {
         'bert_input_id': batch['bert_input_id'], 
         'bert_attention_mask': batch['bert_attention_mask'], 

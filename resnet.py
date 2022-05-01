@@ -6,17 +6,16 @@ from torch.nn import functional as F
 
 
 class ResNet50(ResNet, LightningModule):
-    def __init__(self, num_classes: int = 2):
+    def __init__(self, num_classes: int = 2, is_greyscale=False):
         LightningModule.__init__(self)
         ResNet.__init__(self, Bottleneck, [3, 4, 6, 3], num_classes=num_classes if num_classes > 2 else 1)
-        in_channels = 1
-        self.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3, bias=False)
+        if is_greyscale:
+            in_channels = 1
+            self.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3, bias=False)
 
     # def forward(self, x) - define in ResNet
 
     def common_step(self, batch, batch_idx, mode):
-        print(type(batch), len(batch))
-        print(batch)
         x, y = batch
         y_pred = self(x)
         loss = F.cross_entropy(y_pred, y)  # F.mse_loss(self(x), x)
