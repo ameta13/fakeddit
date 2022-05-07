@@ -13,14 +13,6 @@ class MultiModalModel(LightningModule):
         assert agg_type in {'conc.avg+sum', 'conc'}, f'Wrong aggregation type: {self.agg_type}'
         self.agg_type = agg_type
         self.num_classes = num_classes if num_classes > 2 else 1
-        # Image model
-        self.image_model = image_model()
-        image_model_feature_size = self.image_model.fc.in_features
-        self.image_model.fc = nn.Linear(image_model_feature_size, image_model_feature_size)
-        # Freeze image model
-        if freeze_image_model:
-            for param in self.image_model.parameters():
-                param.requires_grad = False
 
         # Text model
         self.text_model = text_model.bert
@@ -29,6 +21,18 @@ class MultiModalModel(LightningModule):
         # Freeze text model
         if freeze_text_model:
             for param in self.text_model.parameters():
+                param.requires_grad = False
+
+        # Image model
+        self.image_model = image_model()
+        image_model_feature_size_in = self.image_model.fc.in_features
+        image_model_feature_size = image_model_feature_size_in
+        if self.agg_type in {'conc.avg+sum'}:
+            image_model_feature_size = text_model_feature_size
+        self.image_model.fc = nn.Linear(image_model_feature_size_in, image_model_feature_size)
+        # Freeze image model
+        if freeze_image_model:
+            for param in self.image_model.parameters():
                 param.requires_grad = False
 
         # Last layer
