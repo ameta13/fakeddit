@@ -53,7 +53,7 @@ class MultiModalModel(LightningModule):
             conc = torch.cat((text_vector, image_vector))
             avg_vec = torch.mean(conc, dim=0)
             sum_vec = torch.sum(conc, dim=0)
-            return torch.cat((avg_vec, sum_vec), dim=1)
+            return torch.cat((avg_vec, sum_vec), dim=0)
         elif self.agg_type == 'conc':
             return torch.cat((text_vector, image_vector), dim=1)
         else:
