@@ -24,12 +24,19 @@ if __name__ == '__main__':
         '--num-classes', dest='num_classes', type=int, help='number of classes',
         default=2, choices=[2, 3, 6]
     )
+    parser.add_argument('--agg-type', dest='agg_type', type=str, help='type of aggregation text and image vectors',
+                        default='conc', choices=['conc', 'conc.avg+sum'])
+    parser.add_argument('--freeze-type', dest='freeze_type', type=str, help='freeze of text and image models weights',
+                        default='', choices=['', 'image', 'text', 'image+text'])
     args = parser.parse_args()
+    freeze = set(args.freeze_type.split('+'))
+    freeze_image_model, freeze_text_model = 'image' in freeze, 'text' in freeze
     print(f'Max epochs = {args.num_epochs}, num_classes = {args.num_classes}')
 
     # Init our model
     bert = BertForSequenceClassification.from_pretrained('bert-base-uncased')
-    multimodal_model = MultiModalModel(text_model=bert, num_classes=args.num_classes)
+    multimodal_model = MultiModalModel(text_model=bert, num_classes=args.num_classes, agg_type=args.agg_type,
+                                       freeze_text_model=freeze_text_model, freeze_image_model=freeze_image_model)
 
     # Init Dataset
     parts = ['train', 'validate']
@@ -45,7 +52,7 @@ if __name__ == '__main__':
                                     image_dir, img_transform=img_transform)
         for part in parts
     }
-    dataloaders = {part: DataLoader(datasets[part], batch_size=64, shuffle=True, num_workers=4,
+    dataloaders = {part: DataLoader(datasets[part], batch_size=64, shuffle=part=='train', num_workers=4,
                                     persistent_workers=True, collate_fn=my_collate)
                    for part in parts}
 
