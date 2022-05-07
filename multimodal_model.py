@@ -97,4 +97,4 @@ class MultiModalModel(LightningModule):
     def configure_optimizers(self):
         optimizer = optim.Adam(self.parameters(), lr=self.lr)
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', patience=2, factor=0.34, verbose=True)
-        return optimizer, scheduler
+        return [optimizer], [scheduler]
