@@ -32,7 +32,7 @@ class MultiModalModel(LightningModule):
                 param.requires_grad = False
 
         # Last layer
-        if agg_type == 'conc.add+sum':
+        if agg_type == 'conc.avg+sum':
             assert text_model_feature_size == image_model_feature_size, f'Size of text and image vectors are not equal! {text_model_feature_size} != {image_model_feature_size}'
             features_in = 2 * text_model_feature_size
         elif agg_type == 'conc':
@@ -46,7 +46,7 @@ class MultiModalModel(LightningModule):
 
     def aggregate_text_image(self, text_vector, image_vector):
         if self.agg_type == 'conc.avg+sum':
-            conc = torch.cat((a, b))
+            conc = torch.cat((text_vector, image_vector))
             avg_vec = torch.mean(conc, dim=0)
             sum_vec = torch.sum(conc, dim=0)
             return torch.cat((avg_vec, sum_vec), dim=1)
